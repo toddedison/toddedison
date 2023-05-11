@@ -1,0 +1,155 @@
+name: 'IAC Assist Action'
+
+on:
+  
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Do you want to process all files?'
+        required: false
+        default: 'Yes - All Files'
+        type: choice
+        options:
+        - Yes - All Files
+        - No - Only Last Commit Files
+        
+  push:
+    branches: [ master,main ]
+  
+      
+
+jobs:
+  analysis:
+    permissions: write-all
+    runs-on: ubuntu-latest
+   
+
+    steps:
+    - name: checkout version
+      uses: actions/checkout@v2 
+    
+      
+    - name: ThreatModeler Process      
+      uses: actions/checkout@v2  
+      with:
+        repository: threatModeler/GitHubCLI
+        token: ${{ secrets.PAT_TOKEN }}
+        path: ./.github/actions/iac
+        
+    - name: run my action
+      id: iac-assist
+      uses: ./.github/actions/iac
+      with:
+        owner: ${{ github.repository_owner }}
+        name: ${{ github.repository }}
+        branch: ${{ github.ref }}
+        dir: ${{ './' }}
+        batchsize: 2
+        apikey: ${{ secrets.TMDEV5_TOKEN }}
+        bucketkey: ${{ secrets.S3_BUCKET_ACCESS_KEY }}
+        bucketregion: ${{ secrets.S3_BUCKET_REGION_CODE }}
+        bucketsecretkey: ${{ secrets.S3_BUCKET_SECRETACCESS_KEY }}
+        githubtoken: ${{ secrets.REPOSITORY_ACCESS_TOKEN }}        
+        inputvalue: ${{ github.event.inputs.reason }}      
+        lastsha: ${{ github.sha }}
+        repositorybaseurl: 'https://github.com/${{ github.repository }}/blob/${GITHUB_REF##*/}'
+         
+        
+    - name: view log files
+      run: ls -al "./SarifFiles"
+      
+    - name: Store logs results as Build Artifact
+      uses: actions/upload-artifact@v1
+      with:
+          name: IAC_LOG_Results
+          path: ./Logs/
+      
+    - if: ${{ steps.iac-assist.outputs.filesProcess == 'true' }}
+      name: Store SARIF results as Build Artifact
+      uses: actions/upload-artifact@v1
+      with:
+          name: IAC_SARIF_Results
+          path: ./SarifFiles/
+     
+    - if: ${{ steps.iac-assist.outputs.filesProcess == 'true' }} 
+      name: Upload SARIF results to Github
+      uses: github/codeql-action/upload-sarif@v2      
+      with:
+          sarif_file: ./SarifFiles/     name: 'IAC Assist Action'
+
+on:
+  
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Do you want to process all files?'
+        required: false
+        default: 'Yes - All Files'
+        type: choice
+        options:
+        - Yes - All Files
+        - No - Only Last Commit Files
+        
+  push:
+    branches: [ master,main ]
+  
+      
+
+jobs:
+  analysis:
+    permissions: write-all
+    runs-on: ubuntu-latest
+   
+
+    steps:
+    - name: checkout version
+      uses: actions/checkout@v2 
+    
+      
+    - name: ThreatModeler Process      
+      uses: actions/checkout@v2  
+      with:
+        repository: threatModeler/GitHubCLI
+        token: ${{ secrets.PAT_TOKEN }}
+        path: ./.github/actions/iac
+        
+    - name: run my action
+      id: iac-assist
+      uses: ./.github/actions/iac
+      with:
+        owner: ${{ github.repository_owner }}
+        name: ${{ github.repository }}
+        branch: ${{ github.ref }}
+        dir: ${{ './' }}
+        batchsize: 2
+        apikey: ${{ secrets.TMDEV5_TOKEN }}
+        bucketkey: ${{ secrets.S3_BUCKET_ACCESS_KEY }}
+        bucketregion: ${{ secrets.S3_BUCKET_REGION_CODE }}
+        bucketsecretkey: ${{ secrets.S3_BUCKET_SECRETACCESS_KEY }}
+        githubtoken: ${{ secrets.REPOSITORY_ACCESS_TOKEN }}        
+        inputvalue: ${{ github.event.inputs.reason }}      
+        lastsha: ${{ github.sha }}
+        repositorybaseurl: 'https://github.com/${{ github.repository }}/blob/${GITHUB_REF##*/}'
+         
+        
+    - name: view log files
+      run: ls -al "./SarifFiles"
+      
+    - name: Store logs results as Build Artifact
+      uses: actions/upload-artifact@v1
+      with:
+          name: IAC_LOG_Results
+          path: ./Logs/
+      
+    - if: ${{ steps.iac-assist.outputs.filesProcess == 'true' }}
+      name: Store SARIF results as Build Artifact
+      uses: actions/upload-artifact@v1
+      with:
+          name: IAC_SARIF_Results
+          path: ./SarifFiles/
+     
+    - if: ${{ steps.iac-assist.outputs.filesProcess == 'true' }} 
+      name: Upload SARIF results to Github
+      uses: github/codeql-action/upload-sarif@v2      
+      with:
+          sarif_file: ./SarifFiles/     
