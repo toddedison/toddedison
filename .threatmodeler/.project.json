@@ -1,0 +1,16 @@
+{
+  "baseline": {
+    "guid": "88dd2108-544c-4204-903e-f4334af94169",
+    "name": "Ledgerline v1.0",
+    "version": "1.0",
+    "description": "Ledgerline app",
+    "url": "https://tmrc.threatmodeler.us/",
+    "linked_at": "2026-10-23T18:01:26.335877",
+    "linked_from": "github_actions"
+  },
+  "variants": [
+    {
+      "_comment": "Temporary per-PR analysis projects created by this workflow are recorded here."
+    }
+  ]
+}
